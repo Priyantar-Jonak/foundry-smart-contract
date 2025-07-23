@@ -1,0 +1,39 @@
+Compiling 51 files with Solc 0.8.19
+Solc 0.8.19 finished in 12.41s
+Compiler run successful with warnings:
+Warning (3420): Source file does not specify required compiler version! Consider adding "pragma solidity ^0.8.19;"
+--> test/staging/RaffleStagingTest.t.sol
+
+Warning (2072): Unused local variable.
+   --> src/Raffle.sol:147:9:
+    |
+147 |         uint256 requestID = s_vrfCoordinator.requestRandomWords(request);
+    |         ^^^^^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> src/Raffle.sol:151:33:
+    |
+151 |     function fulfillRandomWords(uint256 requestId, uint256[] calldata randomWords) internal override {
+    |                                 ^^^^^^^^^^^^^^^^^
+
+Analysing contracts...
+Running tests...
+
+Ran 8 tests for test/unit/RaffleTest.t.sol:RaffleTest
+[PASS] testCheckUpKeepReturnsFalseIfItHasNoBalance() (gas: 20985)
+[PASS] testCheckUpKeepReturnsFalseIfRaffleIsClosed() (gas: 225248)
+[PASS] testDontAllowPlayersToEnterWhileRaffleIsCalculating() (gas: 230125)
+[PASS] testEnterRaffleRevertsWhenNotEnoughEth() (gas: 11121)
+[PASS] testEnteringRaffleEmitsEvent() (gas: 69713)
+[FAIL: Error != expected error: Raffle__UpkeepNotNeeded(10000000000000000 [1e16], 1, 0) != custom error 0x584327aa] testPerformUpkeepRevertsIfUpkeepIsNotNeeded() (gas: 76318)
+[PASS] testRaffleInitializeInOpenState() (gas: 8068)
+[PASS] testRaffleRecordsPlayerWhenTheyEnter() (gas: 69432)
+Suite result: FAILED. 7 passed; 1 failed; 0 skipped; finished in 36.28ms (12.24ms CPU time)
+
+Ran 1 test suite in 158.64ms (36.28ms CPU time): 7 tests passed, 1 failed, 0 skipped (8 total tests)
+
+Failing tests:
+Encountered 1 failing test in test/unit/RaffleTest.t.sol:RaffleTest
+[FAIL: Error != expected error: Raffle__UpkeepNotNeeded(10000000000000000 [1e16], 1, 0) != custom error 0x584327aa] testPerformUpkeepRevertsIfUpkeepIsNotNeeded() (gas: 76318)
+
+Encountered a total of 1 failing tests, 7 tests succeeded
