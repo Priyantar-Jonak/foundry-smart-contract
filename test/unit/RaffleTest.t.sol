@@ -8,8 +8,9 @@ import {HelperConfig} from "script/HelperConfig.s.sol";
 import {Vm} from "forge-std/Vm.sol";
 import {VRFCoordinatorV2_5Mock} from "lib/chainlink-brownie-contracts/contracts/src/v0.8/vrf/mocks/VRFCoordinatorV2_5Mock.sol";
 import {console} from "forge-std/console.sol";
+import {CodeConstants} from "script/HelperConfig.s.sol";
 
-contract RaffleTest is Test {
+contract RaffleTest is CodeConstants, Test {
     Raffle public raffle;
     HelperConfig public helperConfig;
 
@@ -85,6 +86,7 @@ contract RaffleTest is Test {
 
     function testDontAllowPlayersToEnterWhileRaffleIsCalculating() public raffleEntered { // This test will check if players are not allowed to enter the raffle while it is calculating the winner
         // Arrange // modifier raffleEntered will take care of this
+        raffle.performUpkeep(""); // perform upkeep to calculate the winner
 
         // Act / Assert
         vm.expectRevert(Raffle.Raffle__NotOpen.selector); // expect revert when trying to enter while raffle is not open
@@ -173,7 +175,14 @@ contract RaffleTest is Test {
 
     // FulfillRandomWords Tests
 
-    function testFulfillRandomWordsCanOnlyBeCalledAfterPerformUpkeep(uint256 randomRequestId) public raffleEntered { // This test will check if the fulfillRandomWords function can only be called after performUpkeep for each requestId by fuzzing the randomRequestId
+    modifier skipFork() {
+        if(block.chainid != LOCAL_CHAIN_ID) {
+            return;
+        }
+        _;
+    } // for test of Fulfill Random Words as vrfCoordinator has access control and allows only on-chain-blocks call fulfillRandomWords
+
+    function testFulfillRandomWordsCanOnlyBeCalledAfterPerformUpkeep(uint256 randomRequestId) public raffleEntered skipFork { // This test will check if the fulfillRandomWords function can only be called after performUpkeep for each requestId by fuzzing the randomRequestId
         // This is a stateless fuzz test // the meaning will be discovered later in the stablecoins or security/auditing course
         // Arrange // modifier raffleEntered will take care of this
 
@@ -185,7 +194,7 @@ contract RaffleTest is Test {
         );
     }
 
-    function testFulfillRandomWordsPicksAWinnerResetsAndSendsMoney() public raffleEntered { // This test will check if the fulfillRandomWords function picks a winner, resets the raffle and sends money to the winner
+    function testFulfillRandomWordsPicksAWinnerResetsAndSendsMoney() public raffleEntered skipFork { // This test will check if the fulfillRandomWords function picks a winner, resets the raffle and sends money to the winner
         // Arrange // modifier raffleEntered will take care of a part of this 
         uint256 additionalEntrants = 3; // total 4
         uint256 startingIndex = 1;

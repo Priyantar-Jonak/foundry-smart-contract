@@ -32,6 +32,7 @@ contract HelperConfig is CodeConstants,Script{
         uint32 callbackGasLimit;
         uint256 subscriptionId;
         address link; // LINK token address, if needed
+        address account; // Account address, if needed
     }
 
     NetworkConfig public localNetworkConfig;
@@ -64,8 +65,9 @@ contract HelperConfig is CodeConstants,Script{
             vrfCoordinator: 0x9DdfaCa8183c41ad55329BdeeD9F6A8d53168B1B, // With actual VRF Coordinator address
             gasLane: 0x787d74caea10b2b357790d5b5247c2f63d1d91572a9846f780606e4d953677ae, // Replace with actual gas lane key hash
             callbackGasLimit: 500000, // 500k gas limit for the callback function
-            subscriptionId: 87620953384456090320812723921124439951705707033263307788338528431261453279164 ,// Our function will create a subscription for us if we don't already have one
-            link: 0x779877A7B0D9E8603169DdbD7836e478b4624789 // LINK token address on Sepolia
+            subscriptionId: 107619426351958819046237450084643758260490638633942570858061043000512121414146, // Our function will create a subscription for us if we don't already have one
+            link: 0x779877A7B0D9E8603169DdbD7836e478b4624789, // LINK token address on Sepolia
+            account: 0x588aBBd15eA5aA3862cfF146Eb821bcfd806025B
         });
     }
 
@@ -92,7 +94,8 @@ contract HelperConfig is CodeConstants,Script{
             gasLane: 0x787d74caea10b2b357790d5b5247c2f63d1d91572a9846f780606e4d953677ae, // Replace with actual gas lane key hash
             callbackGasLimit: 500000, // 500k gas limit for the callback function
             subscriptionId: 0, // Our function will create a subscription for us if we don't already have one
-            link: address(linkToken) // LINK token address on the local network
+            link: address(linkToken), // LINK token address on the local network
+            account: 0x1804c8AB1F12E6bbf3894d4083f33e07309d1f38
         });
         return localNetworkConfig;
     }

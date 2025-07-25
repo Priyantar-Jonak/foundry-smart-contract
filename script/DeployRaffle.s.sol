@@ -21,14 +21,14 @@ contract DeployRaffle is Script {
         if(config.subscriptionId == 0) {
             // Create a subscription if it doesn't exist
             CreateSubscription createSubscription = new CreateSubscription();
-            (config.subscriptionId, config.vrfCoordinator) = createSubscription.createSubscription(config.vrfCoordinator); // Create a subscription if it doesn't exist, for the exact same vrfCoordinator address
+            (config.subscriptionId, config.vrfCoordinator) = createSubscription.createSubscription(config.vrfCoordinator, config.account); // Create a subscription if it doesn't exist, for the exact same vrfCoordinator address
         
             // Fund the subscription
             FundSubscription fundSubscription = new FundSubscription();
-            fundSubscription.fundSubscription(config.vrfCoordinator, config.subscriptionId, config.link);
+            fundSubscription.fundSubscription(config.vrfCoordinator, config.subscriptionId, config.link, config.account);
         }
 
-        vm.startBroadcast();
+        vm.startBroadcast(config.account);
         Raffle raffle = new Raffle(
             config.entranceFee,
             config.interval,
@@ -42,7 +42,7 @@ contract DeployRaffle is Script {
         // Add the raffle as a consumer to the subscription
         AddConsumer addConsumer = new AddConsumer();
         // Don't need to broadcast here, as the AddConsumer script already has its own broadcast logic
-        addConsumer.addConsumer(address(raffle), config.vrfCoordinator, config.subscriptionId);
+        addConsumer.addConsumer(address(raffle), config.vrfCoordinator, config.subscriptionId, config.account);
 
         return (raffle, helperConfig);
     }

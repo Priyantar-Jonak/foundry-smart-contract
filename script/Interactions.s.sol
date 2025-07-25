@@ -11,14 +11,14 @@ contract CreateSubscription is Script {
     function createSubscriptionUsingConfig() public returns (uint256, address) {
         HelperConfig helperConfig = new HelperConfig();
         address vrfCoordinator= helperConfig.getConfig().vrfCoordinator; // This will help create the subscription if it doesn't exist, by getting the vrfCoordinator address from the config
-        (uint256 subId, )= createSubscription(vrfCoordinator);
-
+        address account = helperConfig.getConfig().account; // Get the account address from the config
+        (uint256 subId, )= createSubscription(vrfCoordinator, account);
         return (subId, vrfCoordinator);
     }
 
-    function createSubscription(address vrfCoordinator) public returns (uint256, address) {
+    function createSubscription(address vrfCoordinator, address account) public returns (uint256, address) {
         console.log("Creating subscription on ChainID: ", block.chainid);
-        vm.startBroadcast();
+        vm.startBroadcast(account);
         // Create a subscription using the vrfCoordinator address
         uint256 subId = VRFCoordinatorV2_5Mock(vrfCoordinator).createSubscription();
         // This is where you would call the VRFCoordinatorV2_5Mock.createSubscription() function
@@ -44,10 +44,11 @@ contract FundSubscription is Script, CodeConstants {
         address vrfCoordinator = helperConfig.getConfig().vrfCoordinator; // This will help fund the subscription if it doesn't exist, by getting the vrfCoordinator address from the config
         uint256 subscriptionId = helperConfig.getConfig().subscriptionId; // Get the subscription ID from the config
         address linkToken = helperConfig.getConfig().link; // Get the LINK token address from the config
-        fundSubscription(vrfCoordinator, subscriptionId, linkToken);
+        address account = helperConfig.getConfig().account; // Get the account address from the config
+        fundSubscription(vrfCoordinator, subscriptionId, linkToken, account);
     }
 
-    function fundSubscription(address vrfCoordinator, uint256 subscriptionId, address linkToken) public {
+    function fundSubscription(address vrfCoordinator, uint256 subscriptionId, address linkToken, address account) public {
         console.log("Funding subscription on ChainID: ", block.chainid);
         console.log("Using vrfCoordinator: ", vrfCoordinator);
         console.log("Funding subscription with ID: ", subscriptionId);
@@ -58,7 +59,7 @@ contract FundSubscription is Script, CodeConstants {
             VRFCoordinatorV2_5Mock(vrfCoordinator).fundSubscription(subscriptionId, FUND_AMOUNT * 100); // Multiply by 100 to convert to pass 
             vm.stopBroadcast();
         } else {
-            vm.startBroadcast();
+            vm.startBroadcast(account);
             LinkToken(linkToken).transferAndCall(
                 vrfCoordinator,
                 FUND_AMOUNT,
@@ -80,16 +81,16 @@ contract AddConsumer is Script {
         HelperConfig helperConfig = new HelperConfig();
         uint256 subId = helperConfig.getConfig().subscriptionId; // Get the subscription ID from the config
         address vrfCoordinator = helperConfig.getConfig().vrfCoordinator; // This will help add consumers if it doesn't exist, by getting the vrfCoordinator address from the config
-        
-        addConsumer(mostRecentlyDeployed, vrfCoordinator, subId);
+        address account = helperConfig.getConfig().account; // Get the account address from the config
+        addConsumer(mostRecentlyDeployed, vrfCoordinator, subId, account);
     }
 
-    function addConsumer(address contractToAddToVrf, address vrfCoordinator, uint256 subId) public {
+    function addConsumer(address contractToAddToVrf, address vrfCoordinator, uint256 subId, address account) public {
         console.log("Adding consumer: ", contractToAddToVrf);
         console.log("Using vrfCoordinator: ", vrfCoordinator);
         console.log("Subscription ID: ", subId);
 
-        vm.startBroadcast();
+        vm.startBroadcast(account);
         // Add the consumer to the subscription using the vrfCoordinator address and subscription ID
         VRFCoordinatorV2_5Mock(vrfCoordinator).addConsumer(subId, contractToAddToVrf);
         vm.stopBroadcast();
